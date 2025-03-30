@@ -9,11 +9,11 @@ const ServiceForm = ({ handleServiceId }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const serviceIdResponse = await axios.post(`http://localhost:3000/service-id/`, { serviceName: serviceName });
+      const serviceIdResponse = await axios.post(`https://accessibility-hub-be.onrender.com/service-id/`, { serviceName: serviceName });
       if (serviceIdResponse.data) {
         const serviceId = serviceIdResponse.data.service_id;
         console.log('serviceId:', serviceId);
-        await axios.get(`http://localhost:3000/rules/${serviceId}`);
+        await axios.get(`https://accessibility-hub-be.onrender.com/rules/${serviceId}`);
         localStorage.setItem("service_id", serviceId);
         localStorage.setItem("service_name", serviceName);
         handleServiceId(serviceId);
