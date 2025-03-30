@@ -52,7 +52,7 @@ function App() {
               initialSelectedRows.push(rule.ruleId);
             }
             console.log(rule);
-            if(!(rule.tags.includes('wcag2aa') || rule.tags.includes('wcag2a')) || manualFailedRuleIds.data.manual_failed_rule_ids.length === 0) {
+            if(rule.tags.includes('wcag2aaa') || rule.tags.includes('wcag22aa') || rule.tags.includes('experimental') || rule.tags.includes("deprecated") || manualFailedRuleIds.data.manual_failed_rule_ids.length === 0) {
               manualStatus = 'Not tested';
             } else {
               if(manualFailedRuleIds.data.manual_failed_rule_ids.includes(rule.ruleId)) {

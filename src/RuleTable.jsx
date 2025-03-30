@@ -65,6 +65,7 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
       console.log(updatedService.data);
       setOpenSaveDialog(false);
       setSnackbarOpen(true);
+      setInitialRowSelectionModel(rowSelectionModel);
     } catch (error) {
       console.error("Error saving rules:", error);
     }
