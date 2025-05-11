@@ -3,6 +3,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar } from '@mui/material';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { API_URL } from './constants';
 
 export const arraysEqual = (arr1, arr2) => {
   if (arr1.length !== arr2.length) return false;
@@ -61,7 +62,7 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
       const data = {
         ruleIds: rowSelectionModel.join(",")
       };
-      const updatedService = await axios.put(`https://accessibility-hub-be.onrender.com/rules/${serviceId}`, data);
+      const updatedService = await axios.put(`${API_URL}/rules/${serviceId}`, data);
       console.log(updatedService.data);
       setOpenSaveDialog(false);
       setSnackbarOpen(true);

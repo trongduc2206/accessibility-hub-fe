@@ -7,6 +7,7 @@ import ServiceHeader from './ServiceHeader';
 import RuleTable from './RuleTable';
 import axe from 'axe-core';
 import Pa11yTable from './Pa11yTable';
+import { API_URL } from './constants';
 
 function App() {
   const [rules, setRules] = useState([]);
@@ -19,6 +20,7 @@ function App() {
   const [ignoredRules, setIgnoredRules] = useState([]); // State for ignored rules
 
   const handleServiceId = (serviceId) => {
+    localStorage.setItem("service_id", serviceId);
     setServiceId(serviceId);
     setShowForm(false);
   };
@@ -30,10 +32,10 @@ function App() {
         try {
           const initialSelectedRows = [];
           
-          const ruleIds = await axios.get(`https://accessibility-hub-be.onrender.com/rules/${serviceId}`);
-          const ignoreRuleIds = await axios.get(`https://accessibility-hub-be.onrender.com/ignore-pa11y-rules/${serviceId}`);
+          const ruleIds = await axios.get(`${API_URL}/rules/${serviceId}`);
+          const ignoreRuleIds = await axios.get(`${API_URL}/ignore-pa11y-rules/${serviceId}`);
           setIgnoredRules(ignoreRuleIds.data.split(","));
-          const manualFailedRuleIds = await axios.get(`https://accessibility-hub-be.onrender.com/manual-failed-rule-ids/${serviceId}`);
+          const manualFailedRuleIds = await axios.get(`${API_URL}/manual-failed-rule-ids/${serviceId}`);
           if(manualFailedRuleIds.data.manual_failed_rule_ids_pa11y) {
             const pa11yRulesData = manualFailedRuleIds.data.manual_failed_rule_ids_pa11y.map((rule) => ({
               rule: rule,
@@ -101,7 +103,7 @@ function App() {
     const data = {
       ruleIds: newIgnoredRules.join(","),
     }
-    const updatedService = await axios.put(`https://accessibility-hub-be.onrender.com/ignore-pa11y-rules/${serviceId}`, data);
+    const updatedService = await axios.put(`${API_URL}/ignore-pa11y-rules/${serviceId}`, data);
     console.log('updatedService:', updatedService.data);
   };
 

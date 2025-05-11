@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TextField, Button, Box, Typography } from "@mui/material";
 import axios from 'axios';
+import { API_URL } from "./constants";
 
 // eslint-disable-next-line react/prop-types
 const ServiceForm = ({ handleServiceId }) => {
@@ -9,11 +10,11 @@ const ServiceForm = ({ handleServiceId }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const serviceIdResponse = await axios.post(`https://accessibility-hub-be.onrender.com/service-id/`, { serviceName: serviceName });
+      const serviceIdResponse = await axios.post(`${API_URL}/service-id/`, { serviceName: serviceName });
       if (serviceIdResponse.data) {
         const serviceId = serviceIdResponse.data.service_id;
         console.log('serviceId:', serviceId);
-        await axios.get(`https://accessibility-hub-be.onrender.com/rules/${serviceId}`);
+        await axios.get(`${API_URL}/rules/${serviceId}`);
         localStorage.setItem("service_id", serviceId);
         localStorage.setItem("service_name", serviceName);
         handleServiceId(serviceId);
@@ -21,11 +22,9 @@ const ServiceForm = ({ handleServiceId }) => {
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        alert("Service not found. Creating a new one.");
-        // const serviceId = serviceName.replace(/\s+/g, '') + Math.floor(10000 + Math.random() * 90000);
-        // console.log('serviceId:', serviceId);
+        alert("Service not found. A new service will be created for you.");
         try {
-          const serviceIdResponse = await axios.post(`https://accessibility-hub-be.onrender.com/rules/`, { serviceName: serviceName, ruleIds: "" });
+          const serviceIdResponse = await axios.post(`${API_URL}/rules/`, { serviceName: serviceName, ruleIds: "" });
           localStorage.setItem("service_name", serviceName);
           handleServiceId(serviceIdResponse.data);
           alert(`Service Name: ${serviceName}`);
