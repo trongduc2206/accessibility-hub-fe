@@ -31,19 +31,20 @@ function App() {
         setLoading(true);
         try {
           const initialSelectedRows = [];
-          
+
           const ruleIds = await axios.get(`${API_URL}/rules/${serviceId}`);
-          const ignoreRuleIds = await axios.get(`${API_URL}/ignore-pa11y-rules/${serviceId}`);
-          setIgnoredRules(ignoreRuleIds.data.split(","));
+          const ignoreRuleIdsResponse = await axios.get(`${API_URL}/ignore-pa11y-rules/${serviceId}`);
+          const ignoreRuleIdsData = ignoreRuleIdsResponse.data;
+          const ignoredRuleIdList = ignoreRuleIdsData && ignoreRuleIdsData.length > 0 ? ignoreRuleIdsData.split(",") : [];
+          setIgnoredRules(ignoredRuleIdList);
           const manualFailedRuleIds = await axios.get(`${API_URL}/manual-failed-rule-ids/${serviceId}`);
-          if(manualFailedRuleIds.data.manual_failed_rule_ids_pa11y) {
+          if (manualFailedRuleIds.data.manual_failed_rule_ids_pa11y) {
             const pa11yRulesData = manualFailedRuleIds.data.manual_failed_rule_ids_pa11y.map((rule) => ({
               rule: rule,
               id: rule,
             }));
             setPa11yRules(pa11yRulesData);
           }
-          console.log(manualFailedRuleIds.data);
           const ruleIdsArray = ruleIds.data.split(",");
 
           const axeRule = axe.getRules().map((rule) => {
@@ -53,11 +54,10 @@ function App() {
               ciStatus = 'Enabled';
               initialSelectedRows.push(rule.ruleId);
             }
-            console.log(rule);
-            if(rule.tags.includes('wcag2aaa') || rule.tags.includes('wcag22aa') || rule.tags.includes('experimental') || rule.tags.includes("deprecated") || manualFailedRuleIds.data.manual_failed_rule_ids.length === 0) {
+            if (rule.tags.includes('wcag2aaa') || rule.tags.includes('wcag22aa') || rule.tags.includes('experimental') || rule.tags.includes("deprecated") || manualFailedRuleIds.data.manual_failed_rule_ids.length === 0) {
               manualStatus = 'Not tested';
             } else {
-              if(manualFailedRuleIds.data.manual_failed_rule_ids.includes(rule.ruleId)) {
+              if (manualFailedRuleIds.data.manual_failed_rule_ids.includes(rule.ruleId)) {
                 manualStatus = 'Failed';
               }
             }

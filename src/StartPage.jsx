@@ -32,7 +32,7 @@ const ServiceForm = ({ handleServiceId }) => {
           console.error("Error creating service:", postError);
           alert("An error occurred while creating the service. Please try again.");
         }
-      } else {
+      } else {  
         console.error("Error accessing service:", error);
         alert("An error occurred while accessing the service. Please try again.");
       }

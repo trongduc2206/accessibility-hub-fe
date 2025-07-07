@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar } from '@mui/material';
+import { Button, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, IconButton, Tooltip } from '@mui/material';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { API_URL } from './constants';
+import AssistantIcon from '@mui/icons-material/Assistant';
+import InstructionModal from './InstructionModal';
 
 export const arraysEqual = (arr1, arr2) => {
   if (arr1.length !== arr2.length) return false;
@@ -13,29 +15,30 @@ export const arraysEqual = (arr1, arr2) => {
 };
 
 const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, setRules }) => {
-  const [initialRowSelectionModel, setInitialRowSelectionModel] = useState([]);
+  const [initialRowSelectionModel, setInitialRowSelectionModel] = useState(rowSelectionModel);
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [openDiscardDialog, setOpenDiscardDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [enabledCount, setEnabledCount] = useState(0);
+  const [selectedRuleId, setSelectedRuleId] = useState("");
+  const [openInstructionModal, setOpenInstructionModal] = useState(false);
 
-  useEffect(() => {
-    setInitialRowSelectionModel(rowSelectionModel);
+  useEffect(() => {    
     setEnabledCount(rules.filter(rule => rule.ci === 'Enabled').length);
-  }, []);
+  }, [rules]);
 
   useEffect(() => {
     setEnabledCount(rowSelectionModel.length);
-    setRules(rules.map(rule => {
-      if (rowSelectionModel.includes(rule.id)) {
-        return { ...rule, ci: 'Enabled' };
-      }
-      return { ...rule, ci: 'Disabled' };
-    }));
-  }, [rowSelectionModel]);
+    setRules(prevRules =>
+    prevRules.map(rule => ({
+      ...rule,
+      ci: rowSelectionModel.includes(rule.id) ? 'Enabled' : 'Disabled',
+    }))
+  );
+  }, [rowSelectionModel, setRules]);
 
   const paginationModel = { page: 0, pageSize: 10 };
-  // const sortModel = [{ field: 'ci', sort: 'desc' }];
+  const sortModel = [{ field: 'manual', sort: 'asc' }];
 
   const handleSave = () => {
     setOpenSaveDialog(true);
@@ -90,14 +93,14 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
         Number of rules enabled in CI: {enabledCount}
       </Typography>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-        <Button 
+        <Button
           variant="contained"
           style={{ marginLeft: 'auto', visibility: isRowSelectionChanged ? 'visible' : 'hidden' }}
           onClick={handleSave}
         >
           Save changes
         </Button>
-        <Button 
+        <Button
           variant="outlined"
           style={{ visibility: isRowSelectionChanged ? 'visible' : 'hidden' }}
           onClick={handleDiscard}
@@ -110,9 +113,9 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
         columns={[
           { field: 'id', headerName: 'ID', width: 150 },
           { field: 'desc', headerName: 'Description', width: 450 },
-          { 
-            field: 'ci', 
-            headerName: 'CI Status', 
+          {
+            field: 'ci',
+            headerName: 'CI Status',
             width: 150,
             renderCell: (params) => (
               <span style={{ color: params.value === 'Enabled' ? 'green' : 'red' }}>
@@ -120,20 +123,40 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
               </span>
             )
           },
-          { 
-            field: 'manual', 
-            headerName: 'Manual Test', 
+          {
+            field: 'manual',
+            headerName: 'Manual Test',
             width: 200,
             renderCell: (params) => (
-              <span style={{ color: params.value === 'Passed' ? 'green' : params.value === 'Not tested' ? 'blue' : 'red' }}>
-                {params.value}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ color: params.value === 'Passed' ? 'green' : params.value === 'Not tested' ? 'blue' : 'red' }}>
+                  {params.value}
+                </span>
+                {params.value === 'Failed' && (
+                  <Tooltip title="View AI-generated instructions" placement="top">
+                  <IconButton
+                    aria-label="assistant"
+                    size="small"
+                    color="primary"
+                    sx={{ marginLeft: 'auto' }}
+                    onClick={(event) => { 
+                        event.stopPropagation();
+                        console.log('AI', params)
+                        setSelectedRuleId(params.id);
+                        setOpenInstructionModal(true);
+                      }}
+                  >
+                    <AssistantIcon/>
+                  </IconButton>
+                  </Tooltip>
+                )}
+              </div>
             )
           },
         ]}
-        initialState={{ 
+        initialState={{
           pagination: { paginationModel },
-          // sorting: { sortModel } 
+          sorting: { sortModel } 
         }}
         pageSizeOptions={[5, 10]}
         checkboxSelection
@@ -198,6 +221,14 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
         onClose={handleSnackbarClose}
         message="Changes saved successfully"
       />
+      { openInstructionModal &&
+      <InstructionModal
+        open={openInstructionModal}
+        onClose={() => setOpenInstructionModal(false)}
+        ruleId={selectedRuleId}
+        serviceId={serviceId}
+      />
+      }
     </>
   );
 };
