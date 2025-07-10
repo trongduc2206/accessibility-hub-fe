@@ -95,7 +95,20 @@ function App() {
     setRowSelectionModel(updatedRules.filter(rule => rule.ci === 'Enabled').map(rule => rule.id));
   };
 
+  const disableAllFailedManualTest = () => {
+    const updatedRules = rules.map(rule => {
+      if (rule.ci === 'Enabled' && rule.manual === 'Failed') {
+        return { ...rule, ci: 'Disabled' };
+      }
+      return rule;
+    });
+    setRules(updatedRules);
+    setRowSelectionModel(updatedRules.filter(rule => rule.ci === 'Enabled').map(rule => rule.id));
+  };
+
   const hasDisabledPassedManualTest = rules.some(rule => rule.ci === 'Disabled' && rule.manual === 'Passed');
+
+  const hasEnabledFailedManualTest = rules.some(rule => rule.ci === 'Enabled' && rule.manual === 'Failed');
 
   const handleIgnoredRulesChange = async (newIgnoredRules) => {
     setIgnoredRules(newIgnoredRules);
@@ -147,6 +160,16 @@ function App() {
                       style={{ marginBottom: '20px', width: 'fit-content' }}
                     >
                       Enable all rules that passed manual test
+                    </Button>
+                  )}
+                  {hasEnabledFailedManualTest && (
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={disableAllFailedManualTest}
+                      style={{ marginTop: '10px', marginBottom: '20px', width: 'fit-content' }}
+                    >
+                      Disable all rules that failed manual test
                     </Button>
                   )}
                   <RuleTable
