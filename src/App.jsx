@@ -18,6 +18,7 @@ function App() {
   const [selectedTool, setSelectedTool] = useState("axe"); // State to toggle between axe and pa11y
   const [pa11yRules, setPa11yRules] = useState([]);
   const [ignoredRules, setIgnoredRules] = useState([]); // State for ignored rules
+  const [serviceInfo, setServiceInfo] = useState({});
 
   const handleServiceId = (serviceId) => {
     localStorage.setItem("service_id", serviceId);
@@ -27,6 +28,21 @@ function App() {
 
   useEffect(() => {
     if (serviceId && serviceId !== "") {
+
+      async function fetchServiceInfo() {
+        try {
+          const response = await axios.get(`${API_URL}/service/${serviceId}`);
+          if (response.data) {
+            setServiceInfo(response.data);
+          } else {
+            console.error("Service info not found in response.");
+          }
+        } catch (error) {
+          console.error("Error fetching service info:", error);
+        }
+      }
+      fetchServiceInfo();
+
       async function fetchRule() {
         setLoading(true);
         try {
@@ -120,12 +136,36 @@ function App() {
     console.log('updatedService:', updatedService.data);
   };
 
+  const updateGithubInfo = async (newGithubUrl, newGithubBranch, isLoading, isSuccessful, hasError, isFormOpen) => {
+      try {
+        isLoading(true);
+        const serviceId = serviceInfo.service_id;
+  
+        const response = await axios.put(`${API_URL}/service/${serviceId}`, {
+          githubUrl: newGithubUrl,
+          githubBranch: newGithubBranch
+        });
+
+        console.log("Update response:", response.data);
+        setServiceInfo(response.data)
+  
+        isSuccessful(true);
+        isLoading(false);
+        isFormOpen(false);
+        
+      } catch (error) {
+        console.error("Error updating GitHub information:", error);
+        hasError(true);
+        isLoading(false);
+      }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignContent: 'center' }}>
       <h1>Accessibility Hub</h1>
       {
         serviceId && !showForm ? (
-          <ServiceHeader serviceName={serviceId} setShowForm={setShowForm} />
+          <ServiceHeader serviceInfo={serviceInfo} setShowForm={setShowForm} updateGithubInfo={updateGithubInfo} />
         ) : (
           <ServiceForm handleServiceId={handleServiceId} />
         )
@@ -178,6 +218,8 @@ function App() {
                     rowSelectionModel={rowSelectionModel}
                     setRowSelectionModel={setRowSelectionModel}
                     setRules={setRules}
+                    githubUrl={serviceInfo.github_url}
+                    githubBranch={serviceInfo.github_branch}
                   />
                 </>
               ) : (

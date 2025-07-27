@@ -14,8 +14,14 @@ const router = createBrowserRouter([
   },
 ]);
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-)
+const root = createRoot(document.getElementById('root'));
+
+root.render(
+  import.meta.env.VITE_APP_ENV === 'production' ? <StrictMode><RouterProvider router={router} /></StrictMode> : <RouterProvider router={router} />
+);
+
+// createRoot(document.getElementById('root')).render(
+//   <StrictMode>
+//     <RouterProvider router={router} />
+//   </StrictMode>,
+// )

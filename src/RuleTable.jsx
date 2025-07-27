@@ -14,7 +14,7 @@ export const arraysEqual = (arr1, arr2) => {
   return sortedArr1.every((value, index) => value === sortedArr2[index]);
 };
 
-const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, setRules }) => {
+const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, setRules, githubUrl, githubBranch }) => {
   const [initialRowSelectionModel, setInitialRowSelectionModel] = useState(rowSelectionModel);
   const [openSaveDialog, setOpenSaveDialog] = useState(false);
   const [openDiscardDialog, setOpenDiscardDialog] = useState(false);
@@ -227,6 +227,8 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
         onClose={() => setOpenInstructionModal(false)}
         ruleId={selectedRuleId}
         serviceId={serviceId}
+        githubUrl={githubUrl}
+        githubBranch={githubBranch}
       />
       }
     </>
