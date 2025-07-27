@@ -116,9 +116,9 @@ const InstructionModal = ({ ruleId, open, onClose, githubUrl, githubBranch }) =>
                                 //         instruction: "This is a placeholder instruction. Replace with actual API call."
                                 //     }
                                 // }
-                                if (response && response.data?.instruction) {
-                                    setInstruction(response.data.instruction);
-                                    sessionStorage.setItem(`instruction-${ruleId}`, response.data.instruction); // Store in sessionStorage
+                                if (response && response.data?.output) {
+                                    setInstruction(response.data.output);
+                                    sessionStorage.setItem(`instruction-${ruleId}`, response.data.output); // Store in sessionStorage
                                 } else {
                                     setAlertMessage("Instruction not found in response.");
                                     console.error("Instruction not found in response.");
