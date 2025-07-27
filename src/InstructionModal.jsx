@@ -45,9 +45,9 @@ const InstructionModal = ({ ruleId, open, onClose, githubUrl, githubBranch }) =>
                     setLoading(true);
                     let response;
                     if (githubUrl && githubBranch) {
-                        response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId, githubUrl, githubBranch }, { timeout: 70000 });
+                        response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId, githubUrl, githubBranch }, { timeout: 120000 });
                     } else {
-                        response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId }, { timeout: 70000 });
+                        response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId }, { timeout: 120000 });
                     }
                     // await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate network delay
                     // response = {
@@ -85,6 +85,7 @@ const InstructionModal = ({ ruleId, open, onClose, githubUrl, githubBranch }) =>
                     loading ?
                         <div style={{ textAlign: "center", margin: "20px 0" }}>
                             <CircularProgress />
+                            <p>Please wait while the instruction is generating. This could take up to a few minutes.</p>
                         </div>
                         :
                         <div style={{ textAlign: "left", margin: "0 auto" }}>
@@ -94,7 +95,7 @@ const InstructionModal = ({ ruleId, open, onClose, githubUrl, githubBranch }) =>
                 }
 
                 <div style={{ alignItems: 'center', display: 'flex' }}>
-                    <Button onClick={onClose} variant="contained">
+                    <Button onClick={onClose} variant="contained" disabled={loading}>
                         Close
                     </Button>
                     <Tooltip title="Generate new instruction" placement='left-start'>
@@ -105,12 +106,12 @@ const InstructionModal = ({ ruleId, open, onClose, githubUrl, githubBranch }) =>
                                 setLoading(true);
                                 let response;
                                 if (githubUrl && githubBranch) {
-                                    response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId, githubUrl, githubBranch }, { timeout: 70000 });
+                                    response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId, githubUrl, githubBranch }, { timeout: 120000 });
                                 } else {
-                                    response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId }, { timeout: 70000 });
+                                    response = await axios.post(`${API_URL}/instruction-agent/${serviceId}`, { ruleId: ruleId }, { timeout: 120000 });
                                 }
-                                // await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate network delay
-                                // const response = {
+                                // await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate network delay
+                                // response = {
                                 //     data: {
                                 //         instruction: "This is a placeholder instruction. Replace with actual API call."
                                 //     }
