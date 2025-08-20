@@ -70,7 +70,7 @@ function App() {
               ciStatus = 'Enabled';
               initialSelectedRows.push(rule.ruleId);
             }
-            if (rule.tags.includes('wcag2aaa') || rule.tags.includes('wcag22aa') || rule.tags.includes('experimental') || rule.tags.includes("deprecated") || manualFailedRuleIds.data.manual_failed_rule_ids.length === 0) {
+            if (rule.tags.includes('wcag2aaa') || rule.tags.includes('wcag22aa') || rule.tags.includes('experimental') || rule.tags.includes("deprecated") || (manualFailedRuleIds.data.manual_failed_rule_ids.length === 0 && manualFailedRuleIds.data.axe_full_manual_result === null)) {
               manualStatus = 'Not tested';
             } else {
               if (manualFailedRuleIds.data.manual_failed_rule_ids.includes(rule.ruleId)) {
@@ -137,27 +137,27 @@ function App() {
   };
 
   const updateGithubInfo = async (newGithubUrl, newGithubBranch, isLoading, isSuccessful, hasError, isFormOpen) => {
-      try {
-        isLoading(true);
-        const serviceId = serviceInfo.service_id;
-  
-        const response = await axios.put(`${API_URL}/service/${serviceId}`, {
-          githubUrl: newGithubUrl,
-          githubBranch: newGithubBranch
-        });
+    try {
+      isLoading(true);
+      const serviceId = serviceInfo.service_id;
 
-        console.log("Update response:", response.data);
-        setServiceInfo(response.data)
-  
-        isSuccessful(true);
-        isLoading(false);
-        isFormOpen(false);
-        
-      } catch (error) {
-        console.error("Error updating GitHub information:", error);
-        hasError(true);
-        isLoading(false);
-      }
+      const response = await axios.put(`${API_URL}/service/${serviceId}`, {
+        githubUrl: newGithubUrl,
+        githubBranch: newGithubBranch
+      });
+
+      console.log("Update response:", response.data);
+      setServiceInfo(response.data)
+
+      isSuccessful(true);
+      isLoading(false);
+      isFormOpen(false);
+
+    } catch (error) {
+      console.error("Error updating GitHub information:", error);
+      hasError(true);
+      isLoading(false);
+    }
   }
 
   return (

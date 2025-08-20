@@ -89,9 +89,17 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
 
   return (
     <>
-      <Typography variant="h6" gutterBottom>
-        Number of rules enabled in CI: {enabledCount}
-      </Typography>
+      {
+        rules.every(rule => rule.ciStatus === 'Disabled') ? (
+          <Typography variant="h6" gutterBottom>
+                      All default rules are enabled in CI. You can disable them by unchecking the checkbox in the table below.
+          </Typography>
+        ) : (
+          <Typography variant="h6" gutterBottom>
+                        Number of rules enabled in CI: {enabledCount}
+        </Typography>
+        )
+      }
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
         <Button
           variant="contained"
@@ -108,7 +116,7 @@ const RuleTable = ({ serviceId, rules, rowSelectionModel, setRowSelectionModel, 
           Discard changes
         </Button>
       </div>
-      <DataGrid
+      <DataGrid      
         rows={rules}
         columns={[
           { field: 'id', headerName: 'ID', width: 150 },
